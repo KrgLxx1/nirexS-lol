@@ -561,10 +561,7 @@
     // ═══════════════════════════════════════════
     // TYPEWRITER — Bio Text Effect
     // ═══════════════════════════════════════════
-    const bioTexts = [
-        "yeah i coder mate | Python Developer, C#, JS, Front-End | Design - Graphical Designer",
-        "building cool things 🔥 | always learning something new",
-    ];
+    const bioTexts = (typeof siteConfig !== 'undefined' && siteConfig.profile?.bio) || ['nirex'];
     let currentBioIndex = 0;
     let bioCharIndex = 0;
     let isBioTyping = true;
