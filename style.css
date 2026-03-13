@@ -1,0 +1,686 @@
+/* ═══════════════════════════════════════════════
+   NIREX BIO — guns.lol / ezbio / crime.lol style
+   Full-screen centered profile
+   ═══════════════════════════════════════════════ */
+
+/* SF Pro Display — Apple system font fallback chain */
+@font-face {
+    font-family: 'SF Pro Display';
+    src: local('SF Pro Display'), local('SFProDisplay-Regular'), local('.SFNSDisplay-Regular');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'SF Pro Display';
+    src: local('SF Pro Display Medium'), local('SFProDisplay-Medium');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'SF Pro Display';
+    src: local('SF Pro Display Semibold'), local('SFProDisplay-Semibold');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'SF Pro Display';
+    src: local('SF Pro Display Bold'), local('SFProDisplay-Bold');
+    font-weight: 700;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'SF Pro Display';
+    src: local('SF Pro Display Light'), local('SFProDisplay-Light');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+/* ─── Reset ─── */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --accent: #c0c0c0;
+    --accent-glow: rgba(180, 180, 180, 0.35);
+    --border-color: rgba(255, 255, 255, 0.07);
+    --border-hover: rgba(255, 255, 255, 0.15);
+    --text-primary: #e2e2e2;
+    --text-secondary: rgba(200, 200, 200, 0.6);
+    --bg-dark: rgba(0, 0, 0, 0.55);
+    --glass: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --transition: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    color: var(--text-primary);
+    cursor: default;
+}
+
+::selection {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+}
+
+/* ─── Background Video ─── */
+#bg-video {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: -3;
+    filter: brightness(0.4) saturate(1.05);
+}
+
+.video-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: 
+        radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.75) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.25) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.5) 100%);
+    pointer-events: none;
+}
+
+/* ─── Particles ─── */
+#particles {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+
+.particles-active #particles {
+    opacity: 1;
+}
+
+/* ─── Click Overlay ─── */
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: opacity 0.6s var(--transition), visibility 0.6s;
+}
+
+.overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#overlay-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.overlay-blur {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    backdrop-filter: blur(18px) saturate(0.8);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.overlay-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.overlay-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.6);
+    animation: overlayPulse 2.5s ease-in-out infinite;
+    transition: transform 0.3s var(--transition), border-color 0.3s;
+}
+
+.overlay-icon:hover {
+    transform: scale(1.08);
+    border-color: rgba(255,255,255,0.2);
+}
+
+.overlay-title {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+@keyframes overlayPulse {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.15);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 0 16px rgba(255, 255, 255, 0);
+        transform: scale(1.03);
+    }
+}
+
+/* ─── Audio Toggle ─── */
+.audio-toggle {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 900;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(12px);
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.35s var(--transition);
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.audio-toggle.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.audio-toggle:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.7);
+    transform: scale(1.08);
+}
+
+.audio-toggle.playing {
+    color: rgba(255,255,255,0.7);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.06);
+    animation: audioGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes audioGlow {
+    0% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.04); }
+    100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+}
+
+/* ─── Profile Wrapper (single container: fade-in + 3D tilt) ─── */
+.profile-wrapper {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 520px;
+    width: 90vw;
+    padding: 40px 30px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.9s var(--transition), transform 0.9s var(--transition);
+    will-change: transform;
+}
+
+.profile-wrapper.visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* ─── Avatar ─── */
+.avatar-container {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    margin-bottom: 18px;
+    opacity: 0;
+    transform: scale(0.8) translateY(15px);
+    transition: opacity 0.7s var(--transition) 0.1s, transform 0.7s var(--transition) 0.1s;
+}
+
+.profile-wrapper.visible .avatar-container {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    position: relative;
+    z-index: 2;
+    border: 1.5px solid rgba(255,255,255,0.08);
+    transition: border-color 0.4s, transform 0.4s var(--transition);
+}
+
+.avatar:hover {
+    border-color: rgba(255,255,255,0.2);
+    transform: scale(1.04);
+}
+
+/* ─── Discord Status Indicator ─── */
+.status-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid #0a0a0a;
+    z-index: 10;
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.status-online {
+    background-color: #43b581;
+    box-shadow: 0 0 8px rgba(67, 181, 129, 0.5);
+    animation: statusPulse 2s ease-in-out infinite;
+}
+
+.status-idle {
+    background-color: #faa61a;
+    box-shadow: 0 0 8px rgba(250, 166, 26, 0.4);
+}
+
+.status-dnd {
+    background-color: #f04747;
+    box-shadow: 0 0 8px rgba(240, 71, 71, 0.4);
+}
+
+.status-offline {
+    background-color: #747f8d;
+    box-shadow: none;
+}
+
+@keyframes statusPulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(67, 181, 129, 0.4); }
+    50% { box-shadow: 0 0 14px rgba(67, 181, 129, 0.7); }
+}
+
+.avatar-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 1;
+    animation: ringPulse 3s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.03); }
+}
+
+.avatar-glow {
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    opacity: 0.12;
+    z-index: 0;
+    filter: blur(12px);
+    animation: glowPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse {
+    0% { opacity: 0.06; transform: scale(0.95); }
+    100% { opacity: 0.18; transform: scale(1.05); }
+}
+
+/* ─── Username ─── */
+.username {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    font-size: 38px;
+    font-weight: 600;
+    color: #e8e8e8;
+    letter-spacing: -0.5px;
+    text-shadow: 0 0 40px rgba(255,255,255,0.12), 0 0 80px rgba(255, 255, 255, 0.05);
+    margin-bottom: 6px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.7s var(--transition) 0.2s, transform 0.7s var(--transition) 0.2s;
+}
+
+.profile-wrapper.visible .username {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ─── Badges ─── */
+.badges-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 14px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s var(--transition) 0.25s, transform 0.6s var(--transition) 0.25s;
+}
+
+.profile-wrapper.visible .badges-row {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.badge-item {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.45);
+    transition: all 0.3s var(--transition);
+    position: relative;
+    cursor: default;
+}
+
+.badge-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.7);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Badge Tooltip */
+.badge-item[title] {
+    overflow: visible !important;
+}
+
+.badge-item::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.92);
+    color: rgba(255,255,255,0.8);
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s var(--transition);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+}
+
+.badge-item:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ─── Bio ─── */
+.bio {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: 420px;
+    margin-bottom: 10px;
+    min-height: 22px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.7s var(--transition) 0.3s, transform 0.7s var(--transition) 0.3s;
+}
+
+.profile-wrapper.visible .bio {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Blinking cursor for typewriter */
+.bio::after {
+    content: '|';
+    animation: blink 1s step-end infinite;
+    color: rgba(255,255,255,0.3);
+    font-weight: 300;
+    margin-left: 1px;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* ─── Location ─── */
+.location {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 22px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s var(--transition) 0.35s, transform 0.6s var(--transition) 0.35s;
+}
+
+.profile-wrapper.visible .location {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.location svg {
+    opacity: 0.5;
+}
+
+.location span {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* ─── Social Links ─── */
+.social-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.7s var(--transition) 0.4s, transform 0.7s var(--transition) 0.4s;
+}
+
+.profile-wrapper.visible .social-links {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.social-link {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: all 0.35s var(--transition);
+    position: relative;
+    backdrop-filter: blur(4px);
+}
+
+.social-link:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255,255,255,0.16);
+    color: rgba(255,255,255,0.85);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.social-link:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Social Link Tooltip */
+.social-link::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.92);
+    color: rgba(255,255,255,0.8);
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s var(--transition);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    z-index: 50;
+}
+
+.social-link:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ─── View Counter ─── */
+.view-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 400;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.7s var(--transition) 0.5s, transform 0.7s var(--transition) 0.5s;
+}
+
+.profile-wrapper.visible .view-counter {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.view-counter svg {
+    opacity: 0.4;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 0; }
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+    .username {
+        font-size: 28px;
+    }
+
+    .bio {
+        font-size: 13px;
+        max-width: 320px;
+    }
+
+    .avatar-container {
+        width: 72px;
+        height: 72px;
+    }
+
+    .social-link {
+        width: 40px;
+        height: 40px;
+    }
+
+    .social-link svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .social-links {
+        gap: 10px;
+    }
+
+    .audio-toggle {
+        top: 16px;
+        left: 16px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .profile-wrapper {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 380px) {
+    .username {
+        font-size: 24px;
+    }
+
+    .bio {
+        font-size: 12px;
+    }
+}
+
+/* ─── No-transition on load helper ─── */
+.preload * {
+    transition: none !important;
+}
