@@ -58,7 +58,7 @@ const siteConfig = {
 
     // ─── Media ───
     media: {
-        backgroundVideo: "noga.mp4",
+        backgroundVideo: "background.mp4",
         backgroundAudio: "audio2.mp3",
         audioVolume: 0.5,
     },
