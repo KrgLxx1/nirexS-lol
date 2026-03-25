@@ -1,2 +1,7 @@
-To change the songs and names go to script.js and any other animations/effects are in style.css                         
-Dm me on discord its 2e5d if you want me to add or make your site with custom stuff and to get to your site its yourname.github.io/3d-bio
+## 3D Bio
+
+Modern animated bio page with music, video, and social links.
+
+Live demo: yourname.github.io/3d-bio
+
+Customize in config.js. For help, contact: https://t.me/nirex_design

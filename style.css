@@ -1,9 +1,4 @@
-/* ═══════════════════════════════════════════════
-   NIREX BIO — guns.lol / ezbio / crime.lol style
-   Full-screen centered profile
-   ═══════════════════════════════════════════════ */
 
-/* SF Pro Display — Apple system font fallback chain */
 @font-face {
     font-family: 'SF Pro Display';
     src: local('SF Pro Display'), local('SFProDisplay-Regular'), local('.SFNSDisplay-Regular');
